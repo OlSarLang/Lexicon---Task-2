@@ -17,38 +17,16 @@ namespace Övning2
                     "Tryck på '2' för att sammanställa pris för ett sällskap\n" +
                     "Tryck på '3' för att iterera en input 10ggr\n" +
                     "Tryck på '4' för att dela upp en sträng\n");
-                var input = Console.ReadLine();
-                switch (input)
+                switch (GetInput())
                 {
                     case "0":
                         running = false;
                         break;
                     case "1":
-                        int price = InputAge(1);
-                        string rabatt = "";
-                        switch (price)
-                        {
-                            case 80:
-                                rabatt = "Ungdomspris:";
-                                break;
-                            case 90:
-                                rabatt = "Pensionärspris:";
-                                break;
-                            case 120:
-                                rabatt = "Standardpris:";
-                                break;
-                            case 0:
-                                rabatt = "Gratis!";
-                                break;
-                        }
-                        Console.WriteLine($"{rabatt} {price}");
+                        CheckAge();
                         break;
                     case "2":
-                        var info = HandleCompany();
-                        int amountPeople = info.Item1;
-                        int totalPrice = info.Item2;
-                        Console.WriteLine($"Antal Personer: {amountPeople}.\n" +
-                            $"Totalpris: {totalPrice}\n");
+                        HandleCompany();
                         break;
                     case "3":
                         RepeatTenTimes();
@@ -57,10 +35,32 @@ namespace Övning2
                         SplitSentence();
                         break;
                     default:
-                        Console.WriteLine("Felaktigt format.\n");
+                        WrongFormat();
                         break;
                 }
             }
+        }
+
+        public static void CheckAge()
+        {
+            int price = InputAge(1);
+            string rabatt = "";
+            switch (price)
+            {
+                case 80:
+                    rabatt = "Ungdomspris:";
+                    break;
+                case 90:
+                    rabatt = "Pensionärspris:";
+                    break;
+                case 120:
+                    rabatt = "Standardpris:";
+                    break;
+                case 0:
+                    rabatt = "Gratis!";
+                    break;
+            }
+            Console.WriteLine($"{rabatt} {price}");
         }
 
         public static int InputAge(int i)
@@ -68,54 +68,38 @@ namespace Övning2
             int age;
 
             Console.WriteLine($"Skriv åldern på person {i}\n");
-            var input = Console.ReadLine();
 
-            if (int.TryParse(input, out age))
+            if (int.TryParse(GetInput(), out age))
             {
                 return (CheckAgeGetPrice(age));
             }
             else
             {
-                Console.WriteLine("Felaktigt format. Försök igen.\n");
+                WrongFormat();
             }
             return InputAge(i);
         }
         public static int CheckAgeGetPrice(int age)
         {
-            if (age < 20 && age >= 5)
-            {
-                return 80;
-            }
-            else if (age > 64)
-            {
-                return 90;
-            }
-            else if (age < 5)
-            {
-                return 0;
-            }
-            else if (age > 100)
-            {
-                return 0;
-            }
-            else
-            {
-                return 120;
-            }
+            if (age < 20 && age >= 5) {return 80;}
+            else if (age > 64 && age < 100) {return 90;}
+            else if (age < 5) {return 0;}
+            else if (age >= 100) {return 0;}
+            else {return 120;}
         }
 
-        public static Tuple<int, int> HandleCompany()
+        public static void HandleCompany()
         {
             int amount = AskHowMany();
             int total = 0;
-
 
             for (int i = 1; i <= amount; i++)
             {
                 total += InputAge(i);
             }
 
-            return Tuple.Create(amount, total);
+            Console.WriteLine($"Antal Personer: {amount}.\n" +
+                $"Totalpris: {total}\n");
         }
 
         public static int AskHowMany()
@@ -123,15 +107,14 @@ namespace Övning2
             int amount;
 
             Console.WriteLine("Hur många personer?\n");
-            var input = Console.ReadLine();
 
-            if (int.TryParse(input, out amount))
+            if (int.TryParse(GetInput(), out amount))
             {
                 return (amount);
             }
             else
             {
-                Console.WriteLine("Felaktigt format. Försök igen.\n");
+                WrongFormat();
             }
             return amount;
         }
@@ -139,23 +122,21 @@ namespace Övning2
         public static void RepeatTenTimes()
         {
             Console.WriteLine("Skriv in vad som helst.\n");
-            var input = Console.ReadLine();
-
+            var input = GetInput();
             for (int i = 0; i < 10; i++)
             {
-                Console.WriteLine($"{i}: {input}");
+                Console.Write($"{input}");
             }
+            Console.Write("\n");
         }
 
         public static void SplitSentence()
         {
             Console.WriteLine("Skriv en sträng med åtminstone tre ord.\n");
-            var input = Console.ReadLine();
 
             string thirdWord = "";
 
-            string[] str = input.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-            //List<string> fixedStrings = new List<string>();
+            string[] str = GetInput().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
             if(str.Length > 2)
             {
@@ -177,6 +158,17 @@ namespace Övning2
                 Console.WriteLine("För få ord... Försök igen.\n");
                 SplitSentence();
             }
+        }
+
+        public static string GetInput()
+        {
+            var input = Console.ReadLine();
+            return input;
+        }
+
+        public static void WrongFormat()
+        {
+            Console.WriteLine("Felaktigt format. Försök igen.\n");
         }
     }
 }
